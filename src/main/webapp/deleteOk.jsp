@@ -15,7 +15,7 @@
 		String mnumber = request.getParameter("memberNum");
 		
 		
-		String sql = "DELETE FROM member_tbl WHERE member_num = '"+mnumber+"'";
+		String sql = "DELETE FROM member_tbl WHERE member_num = ?";
 
 		String driverName = "com.mysql.jdbc.Driver";
 		String url = "jdbc:mysql://localhost:3306/member_db";
@@ -23,7 +23,8 @@
 		String password = "12345";
 	
 		Connection conn = null;
-		Statement stmt = null;
+		//Statement stmt = null;
+		PreparedStatement pstmt = null;
 
 
 	
@@ -31,10 +32,13 @@
 			Class.forName(driverName);
 			conn = DriverManager.getConnection(url, username, password);
 			
-			stmt = conn.createStatement();
+			//stmt = conn.createStatement();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, mnumber);
 						
 
-			int success = stmt.executeUpdate(sql);
+			int success = pstmt.executeUpdate();
 			
 			if(success == 1) { //참이면 sql문 성공적으로 실행
 				out.println(mnumber + "님 회원 탈퇴 되었습니다.");
@@ -48,8 +52,8 @@
 			
 		} finally {
 			try{
-				if(stmt != null) {
-					stmt.close();
+				if(pstmt != null) {
+					pstmt.close();
 				}
 				if(conn != null) {
 					conn.close();
